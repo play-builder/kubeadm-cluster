@@ -13,3 +13,11 @@ provider "aws" {
   region = var.aws_region
 
   default_tags {
+    tags = {
+      Project     = "kubeadm-cluster"
+      Environment = "sandbox"
+      ManagedBy   = "terraform"
+    }
+  }
+}
+
