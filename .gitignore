@@ -1,0 +1,42 @@
+
+# Terraform Core
+.terraform/
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+
+
+# Sensitive variable files (ignore tfvars in all paths)
+*.tfvars
+*.tfvars.json
+*.auto.tfvars
+*.auto.tfvars.json
+secret.tfvars
+!*.tfvars.example
+
+
+# Encryption keys and certificates
+*.pem
+*.key
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.vscode/
+*.sh
+!userdata/*.sh
+.idea/
+*.swp
+*.swo
+*~
+
+# Script artifacts
+_BACKUP_SOURCE/
