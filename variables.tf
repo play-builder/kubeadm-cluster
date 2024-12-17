@@ -44,3 +44,27 @@ variable "worker_count" {
   description = "Number of worker nodes to create"
   type        = number
   default     = 2
+}
+
+variable "ebs_volume_size" {
+  description = "Root EBS volume size in GB"
+  type        = number
+  default     = 30
+}
+variable "my_ip" {
+  description = "Your public IP in CIDR notation for remote kubectl access (e.g. 203.0.113.1/32)"
+  type        = string
+}
+
+variable "pod_network_cidr" {
+  description = "Pod network CIDR for CNI plugin (Calico/Flannel)"
+  type        = string
+  default     = "10.244.0.0/16"
+}
+
+variable "kubernetes_version" {
+  description = "Kubernetes version to install"
+  type        = string
+  default     = "1.31"
+}
+
