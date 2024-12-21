@@ -8,3 +8,13 @@ resource "aws_iam_role" "ssm_role" {
         Action = "sts:AssumeRole"
         Effect = "Allow"
         Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = {
+    Name = "${var.cluster_name}-ssm-role"
+  }
+}
