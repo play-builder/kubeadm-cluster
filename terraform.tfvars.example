@@ -1,0 +1,5 @@
+# terraform.tfvars — Copy to terraform.tfvars and edit values
+
+aws_region   = "ap-northeast-2"
+cluster_name = "kubeadm-lab"
+
