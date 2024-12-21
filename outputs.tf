@@ -44,3 +44,26 @@ output "ssm_workers" {
 output "next_steps" {
   description = "Post-deployment instructions"
   value       = <<-EOT
+
+    ================================================================
+    Deployment complete! Follow these steps:
+    ================================================================
+
+    Step 1: Connect via SSM & wait for bootstrap (3-5 min)
+      aws ssm start-session --target ${aws_instance.control_plane.id}
+      sudo su - ubuntu
+      tail -f /var/log/kubeadm-bootstrap.log
+
+    Step 2: Install CNI plugin
+      kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.0/manifests/calico.yaml
+
+    Step 3: Get join command
+      cat /home/ubuntu/join-command.sh
+
+    Step 4: Connect to each worker via SSM and run join
+      sudo <join command from step 3>
+
+    Step 5: Verify
+      kubectl get nodes
+  EOT
+}
