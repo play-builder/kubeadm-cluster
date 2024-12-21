@@ -24,3 +24,30 @@ EOF
 modprobe overlay
 modprobe br_netfilter
 
+cat > /etc/sysctl.d/k8s.conf <<EOF
+net.bridge.bridge-nf-call-iptables  = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.ipv4.ip_forward                 = 1
+EOF
+
+sysctl --system
+
+# 2. Install containerd (CRI runtime)
+apt-get update
+apt-get install -y ca-certificates curl gnupg
+
+# Add Docker official GPG key & repository (for containerd package)
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+  gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+chmod a+r /etc/apt/keyrings/docker.gpg
+
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+  https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+apt-get update
+apt-get install -y containerd.io=2.0.0-1 conntrack
+
+# Generate default config and enable SystemdCgroup
+containerd config default > /etc/containerd/config.toml
