@@ -21,3 +21,26 @@ output "worker_instance_ids" {
 output "worker_public_ips" {
   description = "Worker node public IP addresses"
   value       = [for w in aws_spot_instance_request.workers : w.public_ip]
+}
+
+output "worker_private_ips" {
+  description = "Worker node private IP addresses"
+  value       = [for w in aws_spot_instance_request.workers : w.private_ip]
+}
+
+output "ssm_control_plane" {
+  description = "SSM Session Manager command for control plane"
+  value       = "aws ssm start-session --target ${aws_instance.control_plane.id} --region ${var.aws_region}"
+}
+
+output "ssm_workers" {
+  description = "SSM Session Manager commands for worker nodes"
+  value = [
+    for i, w in aws_spot_instance_request.workers :
+    "aws ssm start-session --target ${w.spot_instance_id} --region ${var.aws_region}  # worker-${i + 1}"
+  ]
+}
+
+output "next_steps" {
+  description = "Post-deployment instructions"
+  value       = <<-EOT
