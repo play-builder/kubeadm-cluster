@@ -51,3 +51,30 @@ apt-get install -y containerd.io=2.0.0-1 conntrack
 
 # Generate default config and enable SystemdCgroup
 containerd config default > /etc/containerd/config.toml
+sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
+
+systemctl restart containerd
+systemctl enable containerd
+
+# 3. Install kubeadm, kubelet, kubectl
+curl -fsSL "https://pkgs.k8s.io/core:/stable:/v${KUBERNETES_VERSION}/deb/Release.key" | \
+  gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] \
+  https://pkgs.k8s.io/core:/stable:/v${KUBERNETES_VERSION}/deb/ /" | \
+  tee /etc/apt/sources.list.d/kubernetes.list
+
+apt-get update
+apt-get install -y kubelet kubeadm kubectl
+apt-mark hold kubelet kubeadm kubectl  # Prevent auto-upgrade
+
+systemctl enable kubelet
+
+# 4. Configure crictl (set containerd socket)
+cat > /etc/crictl.yaml <<EOF
+runtime-endpoint: unix:///run/containerd/containerd.sock
+image-endpoint: unix:///run/containerd/containerd.sock
+timeout: 10
+EOF
+
+echo "=== Common setup completed at $(date) ==="
