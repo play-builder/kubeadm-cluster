@@ -29,3 +29,19 @@ kubeadm init \
 # Configure kubectl for root user
 mkdir -p /root/.kube
 cp /etc/kubernetes/admin.conf /root/.kube/config
+
+# Configure kubectl for ubuntu user (available immediately after SSM login)
+mkdir -p /home/ubuntu/.kube
+cp /etc/kubernetes/admin.conf /home/ubuntu/.kube/config
+chown -R ubuntu:ubuntu /home/ubuntu/.kube
+
+# Enable bash completion and alias
+kubectl completion bash > /etc/bash_completion.d/kubectl
+echo 'alias k=kubectl' >> /home/ubuntu/.bashrc
+echo 'complete -o default -F __start_kubectl k' >> /home/ubuntu/.bashrc
+
+# Save join command for worker nodes
+kubeadm token create --print-join-command > /home/ubuntu/join-command.sh
+chmod 644 /home/ubuntu/join-command.sh
+
+echo "=== Bootstrap completed at $(date) ==="
