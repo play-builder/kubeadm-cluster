@@ -18,3 +18,13 @@ resource "aws_iam_role" "ssm_role" {
     Name = "${var.cluster_name}-ssm-role"
   }
 }
+
+resource "aws_iam_role_policy_attachment" "ssm_core" {
+  role       = aws_iam_role.ssm_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_instance_profile" "ssm_profile" {
+  name = "${var.cluster_name}-ssm-profile"
+  role = aws_iam_role.ssm_role.name
+}
