@@ -41,3 +41,46 @@ resource "aws_vpc_security_group_ingress_rule" "cp_kubelet" {
   security_group_id = aws_security_group.control_plane.id
   description       = "kubelet API from VPC"
   from_port         = 10250
+  to_port           = 10250
+  ip_protocol       = "tcp"
+  cidr_ipv4         = var.vpc_cidr
+}
+
+resource "aws_vpc_security_group_ingress_rule" "cp_controller_manager" {
+  security_group_id = aws_security_group.control_plane.id
+  description       = "kube-controller-manager health check"
+  from_port         = 10257
+  to_port           = 10257
+  ip_protocol       = "tcp"
+  cidr_ipv4         = var.vpc_cidr
+}
+
+resource "aws_vpc_security_group_ingress_rule" "cp_scheduler" {
+  security_group_id = aws_security_group.control_plane.id
+  description       = "kube-scheduler health check"
+  from_port         = 10259
+  to_port           = 10259
+  ip_protocol       = "tcp"
+  cidr_ipv4         = var.vpc_cidr
+}
+
+resource "aws_vpc_security_group_egress_rule" "cp_all_outbound" {
+  security_group_id = aws_security_group.control_plane.id
+  description       = "Allow all outbound (apt, image pull, SSM)"
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
+# ── Worker Node Security Group ──
+
+resource "aws_security_group" "worker" {
+  name        = "${var.cluster_name}-worker-sg"
+  description = "Worker Node: kubelet API, NodePort services"
+  vpc_id      = aws_vpc.main.id
+
+  tags = {
+    Name = "${var.cluster_name}-worker-sg"
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "wk_kubelet" {
