@@ -29,3 +29,34 @@ resource "aws_instance" "control_plane" {
   source_dest_check           = false # Required for CNI overlay packet routing
 
   root_block_device {
+    volume_size           = var.ebs_volume_size
+    volume_type           = "gp3"
+    delete_on_termination = true
+
+    tags = {
+      Name = "${var.cluster_name}-control-plane-ebs"
+    }
+  }
+
+  user_data = templatefile("${path.module}/userdata/control-plane.sh", {
+    node_hostname      = "${var.cluster_name}-control-plane"
+    kubernetes_version = var.kubernetes_version
+    control_plane_ip   = "10.0.1.10"
+    pod_network_cidr   = var.pod_network_cidr
+    common_script      = local.common_script
+  })
+
+  lifecycle {
+    ignore_changes = [user_data, ami]
+  }
+
+  tags = {
+    Name = "${var.cluster_name}-control-plane"
+    Role = "control-plane"
+  }
+}
+
+resource "aws_spot_instance_request" "workers" {
+  count = var.worker_count
+
+  ami                    = data.aws_ami.ubuntu.id
