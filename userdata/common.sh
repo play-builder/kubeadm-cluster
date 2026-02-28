@@ -1,21 +1,14 @@
 #!/bin/bash
-##############################################################################
-# common.sh — All Nodes: Install containerd + kubeadm + kubelet + kubectl
-# Based on: https://kubernetes.io/docs/setup/production-environment/
-##############################################################################
 set -euxo pipefail
 
 exec > >(tee /var/log/kubeadm-bootstrap.log) 2>&1
 echo "=== Bootstrap started at $(date) ==="
 
-# 0. Basic setup
 hostnamectl set-hostname "${NODE_HOSTNAME}"
 
-# Disable swap (required by kubeadm)
 swapoff -a
 sed -i '/swap/d' /etc/fstab
 
-# 1. Kernel modules & sysctl (required for container networking)
 cat > /etc/modules-load.d/k8s.conf <<EOF
 overlay
 br_netfilter
@@ -32,11 +25,9 @@ EOF
 
 sysctl --system
 
-# 2. Install containerd (CRI runtime)
 apt-get update
 apt-get install -y ca-certificates curl gnupg
 
-# Add Docker official GPG key & repository (for containerd package)
 install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
   gpg --dearmor -o /etc/apt/keyrings/docker.gpg
@@ -47,16 +38,22 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.
   tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 apt-get update
-apt-get install -y containerd.io=2.0.0-1 conntrack
 
-# Generate default config and enable SystemdCgroup
+if apt-cache show containerd.io=2.2.1-1 > /dev/null 2>&1; then
+  apt-get install -y containerd.io=2.2.1-1 conntrack
+elif apt-cache show containerd.io=2.2.0-1 > /dev/null 2>&1; then
+  apt-get install -y containerd.io=2.2.0-1 conntrack
+else
+  echo "WARN: containerd 2.2.x not found, installing latest available"
+  apt-get install -y containerd.io conntrack
+fi
+
 containerd config default > /etc/containerd/config.toml
 sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
 
 systemctl restart containerd
 systemctl enable containerd
 
-# 3. Install kubeadm, kubelet, kubectl
 curl -fsSL "https://pkgs.k8s.io/core:/stable:/v${KUBERNETES_VERSION}/deb/Release.key" | \
   gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
@@ -66,11 +63,10 @@ echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] \
 
 apt-get update
 apt-get install -y kubelet kubeadm kubectl
-apt-mark hold kubelet kubeadm kubectl  # Prevent auto-upgrade
+apt-mark hold kubelet kubeadm kubectl
 
 systemctl enable kubelet
 
-# 4. Configure crictl (set containerd socket)
 cat > /etc/crictl.yaml <<EOF
 runtime-endpoint: unix:///run/containerd/containerd.sock
 image-endpoint: unix:///run/containerd/containerd.sock
