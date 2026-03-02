@@ -1,5 +1,3 @@
-# ── Control Plane Security Group ──
-
 resource "aws_security_group" "control_plane" {
   name        = "${var.cluster_name}-control-plane-sg"
   description = "Control Plane: apiserver, etcd, kubelet, scheduler, controller-manager"
@@ -70,8 +68,6 @@ resource "aws_vpc_security_group_egress_rule" "cp_all_outbound" {
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
 }
-
-# ── Worker Node Security Group ──
 
 resource "aws_security_group" "worker" {
   name        = "${var.cluster_name}-worker-sg"
