@@ -54,8 +54,9 @@ output "next_steps" {
       sudo su - ubuntu
       tail -f /var/log/kubeadm-bootstrap.log
 
-    Step 2: Install CNI plugin
-      kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.0/manifests/calico.yaml
+    Step 2: Verify Calico Operator status (auto-installed)          
+      kubectl get tigerastatus                                      
+      kubectl get pods -n calico-system                            
 
     Step 3: Get join command
       cat /home/ubuntu/join-command.sh
