@@ -1,4 +1,3 @@
-
 # Terraform Core
 .terraform/
 **/.terraform/
@@ -12,8 +11,6 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 
-
-
 # Sensitive variable files (ignore tfvars in all paths)
 *.tfvars
 *.tfvars.json
@@ -21,7 +18,6 @@ override.tf.json
 *.auto.tfvars.json
 secret.tfvars
 !*.tfvars.example
-
 
 # Encryption keys and certificates
 *.pem
@@ -31,12 +27,9 @@ secret.tfvars
 .DS_Store
 Thumbs.db
 .vscode/
-*.sh
 !userdata/*.sh
 .idea/
 *.swp
 *.swo
 *~
 
-# Script artifacts
-_BACKUP_SOURCE/
