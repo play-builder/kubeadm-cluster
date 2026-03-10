@@ -10,55 +10,59 @@ EKS 대신 kubeadm을 사용하여 Kubernetes 내부 구조(etcd, apiserver, sch
 - Terraform >= 1.5.0
 - Your public IP (`curl -s ifconfig.me`)
 
+### Quick Start
 
-## Quick Start
-```bash
 # 1. Clone
+
 git clone https://github.com/play-builder/kubeadm-cluster.git
 cd kubeadm-cluster
 
 # 2. Configure
+
 cp terraform.tfvars.example terraform.tfvars
+
 # Edit terraform.tfvars — set my_ip to your public IP
 
 # 3. Deploy
+
 terraform init
 terraform plan
 terraform apply
 
 # 4. Connect to control plane via SSM
+
 aws ssm start-session --target <instance-id>
 sudo su - ubuntu
 
 # 5. Wait for bootstrap to complete (~3-5 min)
+
 tail -f /var/log/kubeadm-bootstrap.log
 
-# 6. Install CNI (Calico)
-kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.0/manifests/calico.yaml
+# 6. Verify Calico CNI (auto-installed via Tigera Operator)
+
+kubectl get tigerastatus  
+kubectl get pods -n calico-system
 
 # 7. Join workers (run on each worker node)
-# Get join command from control plane:
+
 cat /home/ubuntu/join-command.sh
-# Then on each worker via SSM:
 sudo <paste join command>
 
 # 8. Verify
+
 kubectl get nodes
-```
 
 ## Cleanup
 
-```bash
 terraform destroy
-```
-
 
 ## Tech Stack
-| Tool | Version | Purpose |
-|------|---------|---------|
-| Terraform | >= 1.5.0 | Infrastructure as Code |
-| AWS Provider | ~> 5.0 | AWS 리소스 관리 |
-| Kubernetes | 1.31 | Container orchestration |
-| containerd | v2.0.0 | CRI runtime |
-| Calico | v3.28.0 | CNI plugin (pod networking) |
-| Ubuntu | 22.04 LTS (Jammy) | Node OS |
+
+| Tool         | Version   | Purpose                     |
+| ------------ | --------- | --------------------------- |
+| Terraform    | >= 1.5.0  | Infrastructure as Code      |
+| AWS Provider | ~> 6.0    | AWS resource management     |
+| Kubernetes   | 1.35      | Container orchestration     |
+| containerd   | v2.2.x    | CRI runtime                 |
+| Calico       | v3.31.4   | CNI plugin (pod networking) |
+| Ubuntu       | 24.04 LTS | Node OS                     |
