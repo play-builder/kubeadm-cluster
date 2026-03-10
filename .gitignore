@@ -27,7 +27,6 @@ secret.tfvars
 .DS_Store
 Thumbs.db
 .vscode/
-!userdata/*.sh
 .idea/
 *.swp
 *.swo

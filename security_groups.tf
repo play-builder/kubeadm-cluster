@@ -90,7 +90,7 @@ resource "aws_vpc_security_group_ingress_rule" "wk_kubelet" {
 
 resource "aws_vpc_security_group_ingress_rule" "wk_nodeport" {
   security_group_id = aws_security_group.worker.id
-  description       = "NodePort services (learning, open to public)"
+  description       = "NodePort services (sandbox, open to public)"
   from_port         = 30000
   to_port           = 32767
   ip_protocol       = "tcp"
