@@ -28,13 +28,18 @@ terraform apply
 
 aws ssm start-session --target <instance-id>
 sudo su - ubuntu
-
 tail -f /var/log/kubeadm-bootstrap.log
 
+# Verify Calico (auto-installed via Tigera Operator)
 kubectl get tigerastatus
 kubectl get pods -n calico-system
 
+# Get join command on control plane
 cat /home/ubuntu/join-command.sh
+
+# Join each worker (connect to each worker via SSM, then run)
+aws ssm start-session --target <worker-instance-id>
+sudo <paste join command>
 
 kubectl get nodes
 ```
