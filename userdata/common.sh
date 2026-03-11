@@ -39,10 +39,16 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.
 
 apt-get update
 
-if apt-cache show containerd.io=2.2.1-1 > /dev/null 2>&1; then
-  apt-get install -y containerd.io=2.2.1-1 conntrack
-elif apt-cache show containerd.io=2.2.0-1 > /dev/null 2>&1; then
-  apt-get install -y containerd.io=2.2.0-1 conntrack
+# --- containerd install (fixed: use apt-cache madison for exact version resolution) ---
+CONTAINERD_VERSION=""
+if CANDIDATES=$(apt-cache madison containerd.io 2>/dev/null); then
+  # Try 2.2.x first, then fall back to latest available
+  CONTAINERD_VERSION=$(echo "$CANDIDATES" | awk -F'|' '{gsub(/ /,"",$2); print $2}' | grep -m1 '^2\.2\.' || true)
+fi
+
+if [[ -n "$CONTAINERD_VERSION" ]]; then
+  echo "Installing containerd.io=${CONTAINERD_VERSION}"
+  apt-get install -y "containerd.io=${CONTAINERD_VERSION}" conntrack
 else
   echo "WARN: containerd 2.2.x not found, installing latest available"
   apt-get install -y containerd.io conntrack
