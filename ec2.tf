@@ -39,7 +39,7 @@ resource "aws_instance" "control_plane" {
   }
 
   user_data = templatefile("${path.module}/userdata/control-plane.sh", {
-    node_hostname      = "${var.cluster_name}-control-plane"
+    node_hostname      = "cp"
     kubernetes_version = var.kubernetes_version
     control_plane_ip   = "10.0.1.10"
     pod_network_cidr   = var.pod_network_cidr
@@ -79,7 +79,7 @@ resource "aws_spot_instance_request" "workers" {
   }
 
   user_data = templatefile("${path.module}/userdata/worker.sh", {
-    node_hostname      = "${var.cluster_name}-worker-${count.index + 1}"
+    node_hostname      = "wk${count.index + 1}"
     kubernetes_version = var.kubernetes_version
     common_script      = local.common_script
   })

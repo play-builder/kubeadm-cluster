@@ -26,7 +26,20 @@ EOF
 sysctl --system
 
 apt-get update
-apt-get install -y ca-certificates curl gnupg
+# CHANGED: jq + basic debugging/networking tools added
+apt-get install -y \
+  ca-certificates curl gnupg \
+  jq \
+  net-tools \
+  dnsutils \
+  iputils-ping \
+  tcpdump \
+  traceroute \
+  vim \
+  htop \
+  tree \
+  wget \
+  bash-completion
 
 install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
