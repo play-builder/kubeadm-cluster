@@ -92,4 +92,18 @@ image-endpoint: unix:///run/containerd/containerd.sock
 timeout: 10
 EOF
 
+# ADDED: shell aliases (k=kubectl, c=crictl, d=docker) with bash completion
+kubectl completion bash > /etc/bash_completion.d/kubectl
+crictl completion bash > /etc/bash_completion.d/crictl
+command -v docker &>/dev/null && docker completion bash > /etc/bash_completion.d/docker || true
+
+cat >> /home/ubuntu/.bashrc <<'ALIAS_EOF'
+alias k=kubectl
+complete -o default -F __start_kubectl k
+alias c=crictl
+complete -o default -F __start_crictl c
+alias d=docker
+command -v docker &>/dev/null && complete -o default -F __start_docker d
+ALIAS_EOF
+
 echo "=== Common setup completed at $(date) ==="
