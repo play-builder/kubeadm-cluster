@@ -89,6 +89,18 @@ CALICO_EOF
 echo "=== Calico Operator installation initiated at $(date) ==="
 echo "=== Run 'kubectl get tigerastatus' to check readiness ==="
 
+# --- Metrics Server install (--kubelet-insecure-tls for kubeadm self-signed certs) --- # ADDED
+echo "=== Installing Metrics Server at $(date) ==="
+
+METRICS_YAML="/tmp/metrics-server-components.yaml"
+curl -fsSL -o "$METRICS_YAML" \
+  https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+sed -i '/- --metric-resolution=15s/a\        - --kubelet-insecure-tls' "$METRICS_YAML" # ADDED: patch insecure-tls flag
+
+kubectl apply -f "$METRICS_YAML"
+echo "=== Metrics Server installation initiated at $(date) ==="
+
 kubeadm token create --print-join-command > /home/ubuntu/join-command.sh
 chmod 644 /home/ubuntu/join-command.sh
 
