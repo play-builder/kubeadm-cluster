@@ -1,3 +1,5 @@
+# ec2.tf
+
 data "aws_ami" "ubuntu" {
   most_recent = true
   owners      = ["099720109477"]
@@ -92,4 +94,22 @@ resource "aws_spot_instance_request" "workers" {
     Name = "${var.cluster_name}-worker-${count.index + 1}"
     Role = "worker"
   }
+}
+
+# ADDED: Fix spot instance source_dest_check not propagated to actual EC2 instance
+resource "terraform_data" "worker_source_dest_check" {
+  count = var.worker_count
+
+  triggers_replace = [aws_spot_instance_request.workers[count.index].spot_instance_id]
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      aws ec2 modify-instance-attribute \
+        --instance-id ${aws_spot_instance_request.workers[count.index].spot_instance_id} \
+        --no-source-dest-check \
+        --region ${var.aws_region}
+    EOT
+  }
+
+  depends_on = [aws_spot_instance_request.workers]
 }
