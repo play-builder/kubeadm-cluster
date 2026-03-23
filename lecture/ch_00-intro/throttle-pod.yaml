@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: throttle-demo
+  name: throttle-pod
   namespace: default
 spec:
   containers:
