@@ -86,6 +86,16 @@ apt-mark hold kubelet kubeadm kubectl
 
 systemctl enable kubelet
 
+# --- kubecolor install (kubectl output colorizer) --- # ADDED
+echo "=== Installing kubecolor at $(date) ==="
+KUBECOLOR_VERSION="0.5.3"
+curl -fsSL -o /tmp/kubecolor.tar.gz \
+  "https://github.com/kubecolor/kubecolor/releases/download/v${KUBECOLOR_VERSION}/kubecolor_${KUBECOLOR_VERSION}_linux_amd64.tar.gz"
+tar -xzf /tmp/kubecolor.tar.gz -C /tmp kubecolor
+install -m 0755 /tmp/kubecolor /usr/local/bin/kubecolor
+rm -f /tmp/kubecolor.tar.gz /tmp/kubecolor /tmp/LICENSE
+echo "kubecolor v${KUBECOLOR_VERSION} installed"
+
 cat > /etc/crictl.yaml <<EOF
 runtime-endpoint: unix:///run/containerd/containerd.sock
 image-endpoint: unix:///run/containerd/containerd.sock
@@ -98,7 +108,10 @@ crictl completion bash > /etc/bash_completion.d/crictl
 command -v docker &>/dev/null && docker completion bash > /etc/bash_completion.d/docker || true
 
 cat >> /home/ubuntu/.bashrc <<'ALIAS_EOF'
-alias k=kubectl
+# kubecolor: colorized kubectl output wrapper
+alias kubectl="kubecolor"
+alias k=kubecolor
+complete -o default -F __start_kubectl kubectl
 complete -o default -F __start_kubectl k
 alias c=crictl
 complete -o default -F __start_crictl c
