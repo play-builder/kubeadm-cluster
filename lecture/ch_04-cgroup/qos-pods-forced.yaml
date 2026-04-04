@@ -1,0 +1,55 @@
+# qos-pods-forced.yaml
+
+# 🥉 [Tier: BestEffort (Lowest / No Guarantees)]
+# Condition: The 'resources' block is completely omitted.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: besteffort-pod
+spec:
+  nodeName: kubeadm-lab-worker-1  # ★ Bypass scheduler and force assignment to worker-1!
+  containers:
+  - name: nginx
+    image: nginx:1.27
+    # No resources -> BestEffort (Primary target for OOM Killer)
+---
+# 🥈 [Tier: Burstable (Standard / Conditional Guarantee)]
+# Condition: requests < limits (or only limits/requests are set)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: burstable-pod
+spec:
+  nodeName: kubeadm-lab-worker-1
+  containers:
+  - name: nginx
+    image: nginx:1.27
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "250m"
+      limits:
+        memory: "256Mi"
+        cpu: "500m"
+    # requests < limits -> Burstable (Defends memory up to 128Mi)
+
+---
+# 🥇 [Tier: Guaranteed (VVIP / Absolute Protection)]
+# Condition: 'requests' and 'limits' are exactly identical for all containers.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: guaranteed-pod
+spec:
+  nodeName: kubeadm-lab-worker-1  
+  containers:
+  - name: nginx
+    image: nginx:1.27
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "500m"
+      limits:
+        memory: "256Mi"
+        cpu: "500m"
+    # requests == limits -> Guaranteed (Excluded from OOM targets, highest defense)
