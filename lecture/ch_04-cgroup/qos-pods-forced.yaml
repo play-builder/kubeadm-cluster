@@ -9,7 +9,7 @@ metadata:
 spec:
   # nodeName: wk1  # ★ Bypass scheduler and force assignment to worker-1!
   containers:
-  - name: nginx
+  - name: nginx-besteffort
     image: nginx:1.27
     # No resources -> BestEffort (Primary target for OOM Killer)
 ---
@@ -22,7 +22,7 @@ metadata:
 spec:
   # nodeName: wk1  # ★ Bypass scheduler and force assignment to worker-1!
   containers:
-  - name: nginx
+  - name: nginx-burstable
     image: nginx:1.27
     resources:
       requests:
@@ -43,7 +43,7 @@ metadata:
 spec:
   # nodeName: wk1  # ★ Bypass scheduler and force assignment to worker-1!
   containers:
-  - name: nginx
+  - name: nginx-guaranteed
     image: nginx:1.27
     resources:
       requests:
