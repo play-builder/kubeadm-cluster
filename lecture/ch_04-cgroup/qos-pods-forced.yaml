@@ -7,7 +7,7 @@ kind: Pod
 metadata:
   name: besteffort-pod
 spec:
-  # nodeName: kubeadm-lab-worker-1  # ★ Bypass scheduler and force assignment to worker-1!
+  # nodeName: wk1  # ★ Bypass scheduler and force assignment to worker-1!
   containers:
   - name: nginx
     image: nginx:1.27
@@ -20,6 +20,7 @@ kind: Pod
 metadata:
   name: burstable-pod
 spec:
+  # nodeName: wk1  # ★ Bypass scheduler and force assignment to worker-1!
   containers:
   - name: nginx
     image: nginx:1.27
@@ -40,6 +41,7 @@ kind: Pod
 metadata:
   name: guaranteed-pod
 spec:
+  # nodeName: wk1  # ★ Bypass scheduler and force assignment to worker-1!
   containers:
   - name: nginx
     image: nginx:1.27
