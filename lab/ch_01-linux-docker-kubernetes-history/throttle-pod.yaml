@@ -6,7 +6,7 @@ metadata:
 spec:
   containers:
   - name: stress
-    image: polinux/stress
+    image: playbuilder/stress:v1.0
     command: ["stress"]
     args: ["--cpu", "1"]
     resources:

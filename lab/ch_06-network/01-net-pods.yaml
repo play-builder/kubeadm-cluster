@@ -1,0 +1,30 @@
+# ch06 Lab — Network Lab Pod Deployment
+# Deploy 2 Pods on different nodes to test same-node and cross-node communication
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: net-pod-a
+  labels:
+    app: net-lab
+    node: wk1
+spec:
+  nodeName: wk1
+  containers:
+  - name: tools
+    image: playbuilder/net-tools:v1.0
+    command: ["sleep", "infinity"]
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: net-pod-b
+  labels:
+    app: net-lab
+    node: wk2
+spec:
+  nodeName: wk2
+  containers:
+  - name: tools
+    image: playbuilder/net-tools:v1.0
+    command: ["sleep", "infinity"]
