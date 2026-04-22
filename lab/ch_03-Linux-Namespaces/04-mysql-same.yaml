@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mysql-same
+spec:
+  nodeName: wk1
+  containers:
+  - name: mysql
+    image: mysql:5.7
+    args: ["--innodb-buffer-pool-size=20M"]   # ◀◀ Enforce Memory Limit Option
+    env:
+    - name: MYSQL_ROOT_PASSWORD
+      value: "test1234"
