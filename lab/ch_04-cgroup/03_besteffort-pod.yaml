@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: besteffort-pod
+spec:
+  nodeName: wk1
+  containers:
+  - name: nginx-besteffort
+    image: nginx
+    # resources 섹션 없음

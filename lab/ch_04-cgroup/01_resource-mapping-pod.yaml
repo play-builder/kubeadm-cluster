@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: resource-mapping-pod
+  namespace: default
+spec:
+  nodeName: wk1
+  containers:
+  - name: nginx
+    image: nginx
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "70Mi"
+      limits:
+        cpu: "200m"
+        memory: "170Mi"
